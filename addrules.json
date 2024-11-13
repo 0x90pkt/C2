@@ -1,0 +1,216 @@
+{ "nftables": [
+    { "add": {
+      "table": {
+        "family": "ip",
+        "handle": 1,
+        "name": "filter"
+      }
+    }},
+    { "add": {
+      "chain": {
+        "family": "ip",
+        "handle": 1,
+        "name": "ROUTE",
+        "table": "filter"
+      }
+    }},
+    { "add": {
+      "chain": {
+        "family": "ip",
+        "handle": 2,
+        "hook": "input",
+        "name": "INPUT",
+        "policy": "accept",
+        "prio": 0,
+        "table": "filter",
+        "type": "filter"
+      }
+    }},
+    { "add": {
+      "rule": {
+        "chain": "ROUTE",
+        "expr": [
+          {
+            "match": {
+              "left": {
+                "payload": {
+                  "field": "dport",
+                  "protocol": "udp"
+                }
+              },
+              "op": "==",
+              "right": 40296
+            }
+          },
+          {
+            "xt": {
+              "name": "recent",
+              "type": "match"
+            }
+          },
+          {
+            "counter": {
+              "bytes": 0,
+              "packets": 0
+            }
+          },
+          {
+            "drop": null
+          }
+        ],
+        "family": "ip",
+        "handle": 4,
+        "table": "filter"
+      }
+    }},
+    { "add": {
+      "rule": {
+        "chain": "ROUTE",
+        "expr": [
+          {
+            "match": {
+              "left": {
+                "payload": {
+                  "field": "protocol",
+                  "protocol": "ip"
+                }
+              },
+              "op": "==",
+              "right": "udp"
+            }
+          },
+          {
+            "xt": {
+              "name": "recent",
+              "type": "match"
+            }
+          },
+          {
+            "match": {
+              "left": {
+                "payload": {
+                  "field": "dport",
+                  "protocol": "udp"
+                }
+              },
+              "op": "==",
+              "right": 29640
+            }
+          },
+          {
+            "xt": {
+              "name": "recent",
+              "type": "match"
+            }
+          },
+          {
+            "counter": {
+              "bytes": 0,
+              "packets": 0
+            }
+          },
+          {
+            "xt": {
+              "name": "NFQUEUE",
+              "type": "target"
+            }
+          }
+        ],
+        "family": "ip",
+        "handle": 5,
+        "table": "filter"
+      }
+    }},
+    { "add": {
+      "rule": {
+        "chain": "ROUTE",
+        "expr": [
+          {
+            "match": {
+              "left": {
+                "payload": {
+                  "field": "protocol",
+                  "protocol": "ip"
+                }
+              },
+              "op": "==",
+              "right": "udp"
+            }
+          },
+          {
+            "xt": {
+              "name": "recent",
+              "type": "match"
+            }
+          },
+          {
+            "match": {
+              "left": {
+                "payload": {
+                  "field": "dport",
+                  "protocol": "udp"
+                }
+              },
+              "op": "==",
+              "right": 64920
+            }
+          },
+          {
+            "xt": {
+              "name": "recent",
+              "type": "match"
+            }
+          },
+          {
+            "counter": {
+              "bytes": 0,
+              "packets": 0
+            }
+          },
+          {
+            "xt": {
+              "name": "NFQUEUE",
+              "type": "target"
+            }
+          }
+        ],
+        "family": "ip",
+        "handle": 6,
+        "table": "filter"
+      }
+    }},
+    { "add": {
+      "rule": {
+        "chain": "INPUT",
+        "expr": [
+          {
+            "match": {
+              "left": {
+                "payload": {
+                  "field": "protocol",
+                  "protocol": "ip"
+                }
+              },
+              "op": "==",
+              "right": "udp"
+            }
+          },
+          {
+            "counter": {
+              "bytes": 76,
+              "packets": 1
+            }
+          },
+          {
+            "jump": {
+              "target": "ROUTE"
+            }
+          }
+        ],
+        "family": "ip",
+        "handle": 3,
+        "table": "filter"
+      }
+    }}
+  ]
+}
